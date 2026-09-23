@@ -2,13 +2,15 @@
 
 LeadFlow is a full-stack lead management application.
 
-The application allows users to create leads, view leads, search leads, and update lead status.
+The application is being built to allow users to create leads, view leads, search leads, and update lead status.
 
 ## Project Status
 
-🚧 In Development
+🚧 **In Development — Phase 0 Completed**
 
-## Features
+The project is currently in the initial setup and project initialization stage. Core backend and frontend features have not yet been implemented.
+
+## Planned Features
 
 - [ ] Create a lead
 - [ ] List leads
@@ -28,6 +30,7 @@ The application allows users to create leads, view leads, search leads, and upda
 - React
 - TypeScript
 - Vite
+- Tailwind CSS
 
 ### Backend
 
@@ -55,6 +58,10 @@ leadflow/
 
 ### Phase 0 — Project Initialization
 
+**Status: ✅ Completed**
+
+#### Project Setup
+
 - [x] Create project repository
 - [x] Initialize Git
 - [x] Create backend directory
@@ -63,92 +70,203 @@ leadflow/
 - [x] Create README
 - [x] Create AGENT.md
 
-### Phase 1 — Backend Foundation
+#### Backend Setup
 
-- [ ] Setup Node.js
-- [ ] Setup Express
-- [ ] Setup TypeScript
-- [ ] Create application entry point
-- [ ] Create health-check endpoint
+- [x] Setup Node.js
+- [x] Setup Express
+- [x] Setup TypeScript
+- [x] Create application entry point
+- [x] Create health-check endpoint
 
-### Phase 2 — Database
+#### Frontend Setup
 
-- [ ] Configure MongoDB
+- [x] Create React application using Vite
+- [x] Configure TypeScript
+- [x] Configure Tailwind CSS
+
+---
+
+### Phase 1 — Backend API & Data Layer
+
+**Status: ⏳ Not Started**
+
+- [ ] Configure MongoDB connection
 - [ ] Configure Mongoose
 - [ ] Create Lead model
-- [ ] Add Lead validation
+- [ ] Define lead schema
+  - [ ] name
+  - [ ] email
+  - [ ] phone
+  - [ ] status
+  - [ ] createdAt
 
-### Phase 3 — Lead API
+- [ ] Add validation rules
+- [ ] Setup Express middleware
+- [ ] Create routes
+- [ ] Create controller layer
+- [ ] Connect routes to controllers
 
-- [ ] Create lead
-- [ ] List leads
-- [ ] Search leads
-- [ ] Update lead status
+---
 
-### Phase 4 — Backend Quality
+### Phase 2 — Backend Service Layer & Business Logic
 
-- [ ] Error handling
-- [ ] Request validation
-- [ ] Backend tests
+**Status: ⏳ Not Started**
 
-### Phase 5 — Frontend Foundation
+- [ ] Create service layer
+- [ ] Implement `createLead()`
+- [ ] Implement `getLeads()`
+- [ ] Implement `searchLeads(query)`
+- [ ] Implement `updateLeadStatus(id, status)`
+- [ ] Implement error handling
+- [ ] Handle 404 errors
+- [ ] Handle validation errors
+- [ ] Add logging
+- [ ] Test APIs using Postman
 
-- [ ] Create React application
-- [ ] Configure TypeScript
-- [ ] Create application structure
-- [ ] Create Leads page
+---
 
-### Phase 6 — Frontend Features
+### Phase 3 — Backend Testing
 
-- [ ] Lead table
+**Status: ⏳ Not Started**
+
+- [ ] Setup Vitest
+- [ ] Setup Supertest
+- [ ] Test lead creation
+  - [ ] Valid lead
+  - [ ] Invalid lead
+
+- [ ] Test lead listing
+- [ ] Test lead search
+- [ ] Test lead status update
+- [ ] Achieve 70%+ test coverage
+
+---
+
+### Phase 4 — Frontend Foundation & Features
+
+**Status: ⏳ Not Started**
+
+- [ ] Create lead table
 - [ ] Create lead form
-- [ ] Search
-- [ ] Status update
-- [ ] Loading state
-- [ ] Empty state
-- [ ] Error state
+- [ ] Implement search
+- [ ] Implement status update
+- [ ] Add loading state
+- [ ] Add empty state
+- [ ] Add error state
+- [ ] Add form validation
 
-### Phase 7 — Integration
+---
 
-- [ ] Connect frontend to backend
+### Phase 5 — API Integration & Frontend Hooks
+
+**Status: ⏳ Not Started**
+
+- [ ] Connect frontend to backend API
 - [ ] Create lead
 - [ ] Fetch leads
 - [ ] Search leads
-- [ ] Update status
+- [ ] Update lead status
+- [ ] Create API hooks
+- [ ] Add create-lead modal
+- [ ] Implement status update dropdown
+- [ ] Test frontend API interactions
 
-### Phase 8 — Testing & Polish
+---
 
-- [ ] Backend tests
-- [ ] Frontend tests
-- [ ] Responsive UI
-- [ ] Error handling
+### Phase 6 — Testing & Polish
+
+**Status: ⏳ Not Started**
+
+- [ ] Setup Vitest
+- [ ] Setup React Testing Library
+- [ ] Test form submission
+- [ ] Test lead table
+- [ ] Test search behavior
+- [ ] Test status updates
+- [ ] Apply final color system
+- [ ] Apply typography
+- [ ] Check responsive design
+- [ ] Improve error handling
 - [ ] Final UX polish
 
-### Phase 9 — Deployment
+---
+
+### Phase 7 — Deployment
+
+**Status: ⏳ Not Started**
 
 - [ ] Deploy backend
 - [ ] Deploy frontend
-- [ ] Configure production environment
+- [ ] Configure production environment variables
+- [ ] Configure frontend/backend URLs
+- [ ] Test production API
 - [ ] Test production application
 
-### Phase 10 — Documentation
+---
+
+### Phase 8 — Documentation
+
+**Status: ⏳ Not Started**
 
 - [ ] Finalize README
-- [ ] Create AGENT.md
+- [ ] Finalize AGENT.md
 - [ ] Document architecture
 - [ ] Document API
 - [ ] Document deployment
-- [ ] Document trade-offs
+- [ ] Document technical trade-offs
 - [ ] Document future improvements
+
+---
 
 ## API
 
-API documentation will be added after the backend endpoints are implemented.
+API documentation will be added as the backend endpoints are implemented.
+
+Planned endpoints will include:
+
+```text
+GET    /api/leads
+POST   /api/leads
+GET    /api/leads/search
+PATCH  /api/leads/:id/status
+```
+
+> These endpoints are planned and are not implemented yet.
 
 ## Testing
 
-Testing documentation will be added after the test suite is implemented.
+Testing documentation will be added after the backend and frontend test suites are implemented.
 
 ## Deployment
 
-Deployment information will be added after the application is deployed.
+The application is not deployed yet.
+
+Planned deployment:
+
+```text
+Frontend → Vercel
+Backend  → Render
+Database → MongoDB
+```
+
+Deployment configuration will be documented once deployment is completed.
+
+## Future Improvements
+
+Potential future improvements may include:
+
+- Authentication and authorization
+- Lead filtering and sorting
+- Pagination
+- Lead activity history
+- Dashboard and analytics
+- Role-based access control
+- Advanced search
+- Email notifications
+
+---
+
+## License
+
+This project is currently for development and learning purposes.
+# lead-flow
