@@ -12,6 +12,19 @@ export const errorHandler = (
 ) => {
   console.error(error);
 
+  //* MongoDB duplicate key error
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === 11000
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "A lead with this email already exists",
+    });
+  }
+
   //* Handle errors intentionally created by our application.
   if ("statusCode" in error && error.isOperational) {
     return res.status(error.statusCode).json({

@@ -22,6 +22,7 @@ export const createLead = async (req: Request, res: Response) => {
     name,
     email,
     phone,
+    status: req.body.status,
   });
 
   return res.status(201).json({

@@ -1,84 +1,67 @@
 # LeadFlow
 
-LeadFlow is a full-stack lead management application for managing and tracking leads.
-
-The application is being built using the MERN stack with TypeScript. The backend REST API and MongoDB data layer are currently implemented, while frontend development and automated testing will be developed incrementally.
+LeadFlow is a full-stack lead management application built with TypeScript. The backend is implemented and working against MongoDB, while the frontend is currently a minimal React + Vite starter and has not yet been turned into the full lead management UI.
 
 ---
 
 # Project Status
 
-🚧 **In Development**
+## Current state
 
-The project is being developed phase by phase.
+The project is in active development, but the current implementation status is:
 
-The current backend API and business logic are implemented. Automated backend testing and frontend development are the next development phases.
+- Backend API: completed and functional
+- Database layer: completed with MongoDB + Mongoose
+- Frontend: scaffolded but not feature-complete
+- Automated backend tests: not started
+- Frontend UI and API integration: not started
+- Deployment: not configured
 
----
+## Phase overview
 
-# Current Progress
-
-| Phase                                    | Status         |
-| ---------------------------------------- | -------------- |
-| Phase 0 — Project Initialization         | ✅ Completed   |
-| Phase 1 — Backend API & Data Layer       | ✅ Completed   |
-| Phase 2 — Backend Business Logic         | ✅ Completed   |
-| Phase 3 — Backend Testing                | ⏳ Not Started |
-| Phase 4 — Frontend Foundation & Features | ⏳ Not Started |
-| Phase 5 — Frontend API Integration       | ⏳ Not Started |
-| Phase 6 — Testing & Polish               | ⏳ Not Started |
-| Phase 7 — Deployment                     | ⏳ Not Started |
-| Phase 8 — Documentation                  | 🔄 In Progress |
+| Phase | Status |
+| --- | --- |
+| Project initialization | ✅ Completed |
+| Backend API & data layer | ✅ Completed |
+| Backend business logic | ✅ Completed |
+| Backend testing | ⏳ Not started |
+| Frontend foundation | ✅ Scaffolded |
+| Frontend feature implementation | ⏳ Not started |
+| Frontend API integration | ⏳ Not started |
+| Testing & polish | ⏳ Not started |
+| Deployment | ⏳ Not started |
+| Documentation | ✅ Updated |
 
 ---
 
 # Features
 
-## Currently Implemented
+## Implemented in the codebase
 
 - Create a lead
-- List leads
-- Search leads
-- Paginate leads
-- Combine search and pagination
-- Update lead status
+- List leads with pagination
+- Search leads by name, email, phone, or status
+- Update a lead's status
 - Delete a lead
-- MongoDB database connection
-- Mongoose Lead model
-- Mongoose schema validation
-- Express REST API
-- Express-validator request validation
-- Centralized validation error handling
+- MongoDB connection and Mongoose model
+- Request validation with `express-validator`
 - Centralized application error handling
-- `AppError` utility for application-level errors
-- `asyncHandler` for asynchronous controllers
-- Consistent API error responses
-- CORS configuration
-- JSON request parsing
-- Health-check endpoint
-- Environment variable configuration
-- MongoDB duplicate-key error handling
-- Mongoose validation error handling
-- Invalid MongoDB ObjectId handling
-- Not-found error handling
-- Server-side error logging
+- `AppError` utility for expected errors
+- `asyncHandler` wrapper for controllers
+- Health-check endpoint at `/health`
+- CORS and JSON parsing
+- Environment-based configuration
 
-## Planned Features
+## Not yet implemented
 
-- Backend automated tests
-- Frontend lead table
-- Frontend lead form
-- Frontend search
-- Frontend pagination
-- Frontend status update
-- Loading states
-- Empty states
-- Error states
-- Frontend form validation
-- React API service layer
-- React hooks
-- Frontend tests
-- Deployment
+- Frontend lead list screen
+- Lead creation form
+- Search input on the UI
+- Pagination UI
+- Status update controls
+- Loading, empty, and error state UI
+- Automated tests
+- Deployment configuration
 
 ---
 
@@ -90,25 +73,19 @@ The current backend API and business logic are implemented. Automated backend te
 - TypeScript
 - Vite
 - Tailwind CSS
-- React Router
 
 ## Backend
 
 - Node.js
 - Express
 - TypeScript
+- MongoDB
+- Mongoose
 - dotenv
 - CORS
 - express-validator
 
-## Database
-
-- MongoDB
-- Mongoose
-
-## Testing
-
-Planned:
+## Planned testing tools
 
 - Vitest
 - Supertest
@@ -118,106 +95,158 @@ Planned:
 
 # Project Structure
 
-The project is organized into separate frontend and backend applications.
-
 ```text
 leadflow/
-
-│
 ├── backend/
-│   │
 │   ├── src/
-│   │   │
-│   │   ├── app/
-│   │   │   └── app.ts
-│   │   │
-│   │   ├── controllers/
-│   │   │   └── lead.controller.ts
-│   │   │
+│   │   ├── app.ts
+│   │   ├── server.ts
 │   │   ├── db/
 │   │   │   └── db.ts
-│   │   │
+│   │   ├── controllers/
+│   │   │   └── leads.controllers.ts
 │   │   ├── middleware/
 │   │   │   ├── error.middleware.ts
 │   │   │   └── validation.middleware.ts
-│   │   │
 │   │   ├── models/
 │   │   │   └── lead.model.ts
-│   │   │
 │   │   ├── routes/
 │   │   │   └── leads.routes.ts
-│   │   │
 │   │   ├── types/
 │   │   │   ├── error.types.ts
 │   │   │   └── lead.types.ts
-│   │   │
 │   │   ├── utils/
 │   │   │   ├── AppError.ts
-│   │   │   └── asyncHandler.ts
-│   │   │
-│   │   ├── validators/
-│   │   │   └── lead.validator.ts
-│   │   │
-│   │   └── server.ts
-│   │
-│   ├── .env
-│   ├── .env.example
-│   └── package.json
-│
+│   │   │   └── AsyncHandler.ts
+│   │   └── validator/
+│   │       └── lead.validator.ts
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── package-lock.json
 ├── frontend/
-│   └── ...
-│
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── index.css
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   └── index.html
 ├── .gitignore
-├── AGENTS.md
-└── README.md
+├── AGENT.md
+├── README.md
+└── package-lock.json
 ```
 
-> The frontend structure will be documented in detail when frontend development begins.
+---
+
+# Backend API
+
+The backend exposes the following routes:
+
+## Health
+
+- `GET /health`
+ - Returns service health status
+
+## Leads
+
+- `POST /api/leads`
+ - Create a lead
+- `GET /api/leads?search=&page=&limit=`
+ - List leads with optional search and pagination
+- `PATCH /api/leads/:id`
+ - Update the lead status
+- `DELETE /api/leads/:id`
+ - Delete a lead
+
+### Lead status values
+
+- `new`
+- `contacted`
+- `qualified`
+- `lost`
+
+### Validation rules
+
+- `name`: required, trimmed, 2-100 chars
+- `email`: required, valid email format
+- `phone`: required, 10 digits
+- `status`: required on update, must be one of the valid enum values
 
 ---
 
 # Backend Architecture
 
-LeadFlow currently follows a separation-of-concerns structure:
+The backend is organized as a simple layered Express app:
 
 ```text
-HTTP Request
-     │
-     ▼
-   Routes
-     │
-     ▼
- Validation Middleware
-     │
-     ▼
-  asyncHandler
-     │
-     ▼
- Controllers
-     │
-     ▼
- Mongoose Model
-     │
-     ▼
-  MongoDB
+Request
+ ↓
+Routes
+ ↓
+Validation middleware
+ ↓
+asyncHandler
+ ↓
+Controller
+ ↓
+Mongoose model
+ ↓
+MongoDB
 ```
 
-Errors flow through the centralized error system:
+Errors flow through a centralized app-level handler:
 
 ```text
-Controller / Middleware
-        │
-        ▼
-      Error
-        │
-        ▼
-   asyncHandler
-        │
-        ▼
-   errorHandler
-        │
-        ▼
- HTTP Error Response
+Controller / middleware error
+ ↓
+next(error)
+ ↓
+errorHandler
+ ↓
+JSON HTTP error response
+```
+
+Key implementation patterns:
+
+- Routes stay thin and delegate to controllers.
+- Validation belongs in the validator layer.
+- Business logic is kept inside controller functions.
+- Expected application errors are created with `AppError`.
+- `asyncHandler` prevents repeated try/catch boilerplate.
+
+---
+
+# Local Development
+
+## Backend
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Set a `MONGO_URI` in a local `.env` file before starting the backend.
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+# Notes for Contributors
+
+- Do not put business logic in the route files.
+- Keep validation in the validator layer.
+- Use the existing `AppError` and `asyncHandler` patterns.
+- Keep the frontend work separate from backend implementation until the backend API is stable.
+- Update documentation when new features or architecture changes are introduced.
 ```
 
 ---
