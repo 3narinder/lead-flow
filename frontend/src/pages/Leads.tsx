@@ -1,84 +1,101 @@
-import { useEffect, useMemo, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { leads as initialLeads } from "../data/leads";
+
+import toast from "react-hot-toast";
+
+import LeadFormModal from "../ui/LeadFormModal";
+
 import LeadTable from "../features/leads/LeadsTable";
 import LeadsTableOperations from "../features/leads/LeadTableOperations";
-import { simulateRequest } from "../lib/toastConfig";
-import type { Lead } from "../types/lead";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
-import LeadFormModal, { type LeadFormValues } from "../ui/LeadFormModal";
+
+import {
+  useCreateLead,
+  useDeleteLead,
+  useLeads,
+  useUpdateLead,
+} from "../features/leads/useLeads";
+
+import type { Lead, LeadFormValues, LeadStatus } from "../types/lead";
 
 const PAGE_SIZE = 10;
 
-const sortLeads = (items: Lead[], sortBy: string) => {
-  const sorted = [...items];
-
-  switch (sortBy) {
-    case "name-asc":
-      return sorted.sort((a, b) => a.name.localeCompare(b.name));
-    case "name-desc":
-      return sorted.sort((a, b) => b.name.localeCompare(a.name));
-    case "createdAt-asc":
-      return sorted.sort((a, b) => Number(a.id) - Number(b.id));
-    case "createdAt-desc":
-    default:
-      return sorted.sort((a, b) => Number(b.id) - Number(a.id));
-  }
-};
-
 const Leads = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [leadList, setLeadList] = useState<Lead[]>(initialLeads);
+  const [searchParams] = useSearchParams();
+
   const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [mode, setMode] = useState<"create" | "edit">("create");
+
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
 
-  const search = (searchParams.get("search") ?? "").trim().toLowerCase();
-  const statusFilter = searchParams.get("status") ?? "all";
-  const sortBy = searchParams.get("sortBy") ?? "createdAt-desc";
+  //* --------------------------------
+  //* URL parameters
+  //* --------------------------------
+
+  const search = (searchParams.get("search") ?? "").trim();
+
+  const statusParam = searchParams.get("status");
+
+  const status: LeadStatus | undefined =
+    statusParam && statusParam !== "all"
+      ? (statusParam as LeadStatus)
+      : undefined;
+
+  const sortParam = searchParams.get("sortBy") ?? "createdAt-desc";
+
+  const [sortBy, sortOrder] = sortParam.split("-");
+
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
 
-  const filteredLeads = useMemo(() => {
-    let result = leadList;
+  //* --------------------------------
+  //* GET
+  //* --------------------------------
 
-    if (search) {
-      result = result.filter(
-        (lead) =>
-          lead.name.toLowerCase().includes(search) ||
-          lead.email.toLowerCase().includes(search) ||
-          lead.phone.includes(search),
-      );
-    }
+  const { data, isLoading, isError, error } = useLeads({
+    search,
+    status,
+    sortBy,
+    sortOrder: sortOrder === "asc" ? "asc" : "desc",
+    page: currentPage,
+    limit: PAGE_SIZE,
+  });
 
-    if (statusFilter !== "all") {
-      result = result.filter((lead) => lead.status === statusFilter);
-    }
+  //* --------------------------------
+  //* CREATE
+  //* --------------------------------
 
-    return sortLeads(result, sortBy);
-  }, [leadList, search, sortBy, statusFilter]);
+  const createMutation = useCreateLead();
 
-  const totalCount = filteredLeads.length;
-  const pageCount =
-    totalCount === 0 ? 0 : Math.ceil(totalCount / PAGE_SIZE);
-  const safePage =
-    pageCount === 0 ? 1 : Math.min(currentPage, Math.max(1, pageCount));
+  //* --------------------------------
+  //* UPDATE
+  //* --------------------------------
 
-  useEffect(() => {
-    if (pageCount === 0 || currentPage === safePage) return;
+  const updateMutation = useUpdateLead();
 
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("page", String(safePage));
-    setSearchParams(newParams, { replace: true });
-  }, [currentPage, pageCount, safePage, searchParams, setSearchParams]);
+  //* --------------------------------
+  //* DELETE
+  //* --------------------------------
 
-  const paginatedLeads = useMemo(() => {
-    const start = (safePage - 1) * PAGE_SIZE;
-    return filteredLeads.slice(start, start + PAGE_SIZE);
-  }, [safePage, filteredLeads]);
+  const deleteMutation = useDeleteLead();
+
+  //* --------------------------------
+  //* Data
+  //* --------------------------------
+
+  const leads = data?.data ?? [];
+
+  const pagination = data?.pagination;
+
+  const totalCount = pagination?.totalLeads ?? 0;
+
+  const safePage = pagination?.page ?? 1;
+
+  //* --------------------------------
+  //* Form modal
+  //* --------------------------------
 
   const openCreateModal = () => {
     setSelectedLead(null);
@@ -99,75 +116,101 @@ const Leads = () => {
   };
 
   const handleCloseModal = () => {
-    if (isSubmitting) return;
+    if (createMutation.isPending || updateMutation.isPending) {
+      return;
+    }
+
     resetFormState();
   };
 
+  //* --------------------------------
+  //* CREATE / UPDATE
+  //* --------------------------------
+
   const handleCreateOrUpdate = async (values: LeadFormValues) => {
-    setIsSubmitting(true);
-
-    const loadingMessage =
-      mode === "create" ? "Creating lead..." : "Saving changes...";
-    const toastId = toast.loading(loadingMessage);
-
     try {
-      await simulateRequest();
-
       if (mode === "create") {
-        const nextLead: Lead = {
-          id: crypto.randomUUID(),
-          ...values,
-        };
+        await createMutation.mutateAsync(values);
 
-        setLeadList((current) => [nextLead, ...current]);
-        toast.success("Lead created successfully", { id: toastId });
-      } else if (selectedLead) {
-        setLeadList((current) =>
-          current.map((lead) =>
-            lead.id === selectedLead.id ? { ...lead, ...values } : lead,
-          ),
-        );
-        toast.success("Lead updated successfully", { id: toastId });
-      } else {
-        toast.dismiss(toastId);
+        toast.success("Lead created successfully");
+      }
+
+      if (mode === "edit" && selectedLead) {
+        await updateMutation.mutateAsync({
+          id: selectedLead.id,
+          values,
+        });
+
+        toast.success("Lead updated successfully");
       }
 
       resetFormState();
-    } catch {
-      toast.error("Something went wrong. Please try again.", { id: toastId });
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
     }
   };
+
+  //* --------------------------------
+  //* DELETE
+  //* --------------------------------
 
   const requestDeleteLead = (lead: Lead) => {
     setLeadToDelete(lead);
   };
 
   const closeDeleteModal = () => {
-    if (deletingId) return;
+    if (deleteMutation.isPending) {
+      return;
+    }
+
     setLeadToDelete(null);
   };
 
   const confirmDeleteLead = async () => {
-    if (!leadToDelete) return;
-
-    setDeletingId(leadToDelete.id);
-    const toastId = toast.loading("Deleting lead...");
+    if (!leadToDelete) {
+      return;
+    }
 
     try {
-      await simulateRequest(500);
-      setLeadList((current) =>
-        current.filter((item) => item.id !== leadToDelete.id),
-      );
-      toast.success("Lead deleted successfully", { id: toastId });
+      await deleteMutation.mutateAsync(leadToDelete.id);
+
+      toast.success("Lead deleted successfully");
+
       setLeadToDelete(null);
-    } catch {
-      toast.error("Could not delete lead. Please try again.", { id: toastId });
-    } finally {
-      setDeletingId(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not delete lead. Please try again.",
+      );
     }
   };
+
+  //* --------------------------------
+  //* GET error
+  //* --------------------------------
+
+  if (isError) {
+    return (
+      <div className="w-full space-y-6">
+        <div className="rounded-2xl border border-border bg-surface p-6">
+          <h1 className="page-title">Something went wrong</h1>
+
+          <p className="secondary-text mt-2">
+            {error instanceof Error ? error.message : "Failed to load leads."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  //* --------------------------------
+  //* UI
+  //* --------------------------------
 
   return (
     <div className="w-full space-y-6">
@@ -176,9 +219,11 @@ const Leads = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
             Pipeline
           </p>
+
           <h1 className="page-title mt-2">All leads</h1>
+
           <p className="secondary-text mt-1.5">
-            Manage and track your pipeline · {leadList.length} total
+            Manage and track your pipeline · {totalCount} total
           </p>
         </div>
 
@@ -196,14 +241,16 @@ const Leads = () => {
 
       <div className="w-full">
         <LeadTable
-          leads={paginatedLeads}
-          isLoading={false}
-          isDeletingId={deletingId}
+          leads={leads}
+          isLoading={isLoading}
+          isDeletingId={
+            deleteMutation.isPending ? deleteMutation.variables : null
+          }
           onEdit={openEditModal}
           onDelete={requestDeleteLead}
           onAddLead={openCreateModal}
           totalCount={totalCount}
-          pageSize={PAGE_SIZE}
+          pageSize={pagination?.limit ?? PAGE_SIZE}
           currentPage={safePage}
         />
       </div>
@@ -212,7 +259,7 @@ const Leads = () => {
         open={isFormOpen}
         mode={mode}
         lead={selectedLead}
-        isSubmitting={isSubmitting}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
         onClose={handleCloseModal}
         onSubmit={handleCreateOrUpdate}
       />
@@ -220,7 +267,7 @@ const Leads = () => {
       <ConfirmDeleteModal
         open={Boolean(leadToDelete)}
         leadName={leadToDelete?.name}
-        isDeleting={Boolean(deletingId && leadToDelete?.id === deletingId)}
+        isDeleting={deleteMutation.isPending}
         onClose={closeDeleteModal}
         onConfirm={confirmDeleteLead}
       />

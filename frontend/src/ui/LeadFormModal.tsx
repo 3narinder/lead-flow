@@ -1,15 +1,8 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import type { Lead, LeadStatus } from "../types/lead";
+import type { Lead, LeadFormValues, LeadStatus } from "../types/lead";
 import Modal from "./Modal";
 import { SpinnerInline } from "./Spinner";
-
-export type LeadFormValues = {
-  name: string;
-  email: string;
-  phone: string;
-  status: LeadStatus;
-};
 
 interface LeadFormModalProps {
   open: boolean;
@@ -31,7 +24,6 @@ const statusOptions: { value: LeadStatus; label: string }[] = [
   { value: "new", label: "New" },
   { value: "contacted", label: "Contacted" },
   { value: "qualified", label: "Qualified" },
-  { value: "converted", label: "Converted" },
   { value: "lost", label: "Lost" },
 ];
 
@@ -118,7 +110,9 @@ const LeadFormModal = ({
               placeholder="jane@company.com"
             />
             {errors.email && (
-              <p className="mt-1.5 text-xs text-error">{errors.email.message}</p>
+              <p className="mt-1.5 text-xs text-error">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -138,7 +132,9 @@ const LeadFormModal = ({
               placeholder="+91 98765 43210"
             />
             {errors.phone && (
-              <p className="mt-1.5 text-xs text-error">{errors.phone.message}</p>
+              <p className="mt-1.5 text-xs text-error">
+                {errors.phone.message}
+              </p>
             )}
           </div>
 
@@ -159,7 +155,9 @@ const LeadFormModal = ({
               ))}
             </select>
             {errors.status && (
-              <p className="mt-1.5 text-xs text-error">{errors.status.message}</p>
+              <p className="mt-1.5 text-xs text-error">
+                {errors.status.message}
+              </p>
             )}
           </div>
         </div>

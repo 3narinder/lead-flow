@@ -6,6 +6,12 @@ import Lead from "../models/lead.model.js";
 import { CreateLeadInput, UpdateLeadStatusInput } from "../types/lead.types.js";
 
 import { AppError } from "../utils/AppError.js";
+import {
+  buildLeadFilter,
+  buildLeadSort,
+  getPagination,
+  isLeadStatus,
+} from "../utils/leadQuery.js";
 
 //* Check whether the provided ID is a valid MongoDB ObjectId
 
@@ -31,104 +37,63 @@ export const createLead = async (req: Request, res: Response) => {
   });
 };
 
-//* --------------------------------------------------
 //* @GET /api/leads
-//*  Get leads with search, status filtering, sorting and pagination
-//* --------------------------------------------------
+//* Get leads with search, status filtering, sorting and pagination
 
 export const getLeads = async (req: Request, res: Response) => {
-  // --------------------------------------------------
-  // Search
-  // --------------------------------------------------
-
+  // * Search
   const search =
     typeof req.query.search === "string" ? req.query.search.trim() : "";
 
-  //* Status filter
-
-  const status =
+  //* Status
+  const statusQuery =
     typeof req.query.status === "string" ? req.query.status.trim() : "";
 
+  //* Validate status
+  const status = isLeadStatus(statusQuery) ? statusQuery : "";
+
+  //* Sorting
+  const sortBy =
+    typeof req.query.sortBy === "string" ? req.query.sortBy.trim() : "";
+
+  const sortOrder =
+    typeof req.query.sortOrder === "string" ? req.query.sortOrder.trim() : "";
+
   //* Pagination
+  const page = typeof req.query.page === "string" ? req.query.page : "";
 
-  const page = typeof req.query.page === "string" ? Number(req.query.page) : 1;
+  const limit = typeof req.query.limit === "string" ? req.query.limit : "";
 
-  const limit =
-    typeof req.query.limit === "string" ? Number(req.query.limit) : 10;
+  //* Build query pieces
+  const filter = buildLeadFilter(search, status);
 
-  //* Make sure page is a positive integer
-  const currentPage = Number.isInteger(page) && page > 0 ? page : 1;
+  const sort = buildLeadSort(sortBy, sortOrder);
 
-  //* Make sure limit is a positive integer and doesn't exceed 100
-  const currentLimit =
-    Number.isInteger(limit) && limit > 0 && limit <= 100 ? limit : 10;
+  const pagination = getPagination(page, limit);
 
-  //* Number of documents to skip
-  const skip = (currentPage - 1) * currentLimit;
-
-  //* Build filter
-
-  const filter: Record<string, unknown> = {};
-
-  //* Exact status filter
-
-  if (status) {
-    filter.status = status;
-  }
-
-  //* Search filter
-
-  if (search) {
-    filter.$or = [
-      {
-        name: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        email: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        phone: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        status: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-    ];
-  }
-
-  //* Get leads + total count
-
+  //* Get leads and total count at the same time.
   const [leads, totalLeads] = await Promise.all([
-    Lead.find(filter).sort({ createdAt: -1 }).skip(skip).limit(currentLimit),
+    Lead.find(filter).sort(sort).skip(pagination.skip).limit(pagination.limit),
 
     Lead.countDocuments(filter),
   ]);
 
-  //* Calculate total pages
-  const totalPages = Math.ceil(totalLeads / currentLimit);
+  //* Calculate total pages.
+  const totalPages = Math.ceil(totalLeads / pagination.limit);
 
-  //* Response
+  //* Send response.
   return res.status(200).json({
     success: true,
 
     pagination: {
-      page: currentPage,
-      limit: currentLimit,
+      page: pagination.page,
+      limit: pagination.limit,
       totalLeads,
       totalPages,
-      hasNextPage: currentPage < totalPages,
-      hasPreviousPage: currentPage > 1,
+
+      hasNextPage: pagination.page < totalPages,
+
+      hasPreviousPage: pagination.page > 1,
     },
 
     data: leads,

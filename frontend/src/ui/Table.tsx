@@ -79,7 +79,7 @@ const Body = <T,>({ data, render }: TableBodyProps<T>) => {
     );
   }
 
-  return <div>{data.map(render)}</div>;
+  return <div className="max-h-125 overflow-y-auto">{data.map(render)}</div>;
 };
 
 const Footer = ({ children }: TablePartProps) => {

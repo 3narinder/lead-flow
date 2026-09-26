@@ -3,7 +3,7 @@ import { SpinnerInline } from "../ui/Spinner";
 
 export const AppToaster = () => (
   <Toaster
-    position="top-right"
+    position="top-center"
     toastOptions={{
       duration: 2600,
       style: {
