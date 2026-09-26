@@ -1,9 +1,6 @@
 import type { LeadStatus } from "../types/lead";
 
-const statusConfig: Record<
-  LeadStatus,
-  { label: string; className: string }
-> = {
+const statusConfig: Record<LeadStatus, { label: string; className: string }> = {
   new: {
     label: "New",
     className: "status-badge status-badge-new",
@@ -16,10 +13,7 @@ const statusConfig: Record<
     label: "Qualified",
     className: "status-badge status-badge-qualified",
   },
-  converted: {
-    label: "Converted",
-    className: "status-badge status-badge-converted",
-  },
+
   lost: {
     label: "Lost",
     className: "status-badge status-badge-lost",

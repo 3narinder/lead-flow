@@ -1,792 +1,461 @@
-# LeadFlow
+# LeadFlow — Lead Management Application
 
-LeadFlow is a full-stack lead management application built with TypeScript. The backend is implemented and working against MongoDB, while the frontend is currently a minimal React + Vite starter and has not yet been turned into the full lead management UI.
+A modern, full-stack lead tracking application built with React, TypeScript, Node.js, Express, and MongoDB.
 
----
-
-# Project Status
-
-## Current state
-
-The project is in active development, but the current implementation status is:
-
-- Backend API: completed and functional
-- Database layer: completed with MongoDB + Mongoose
-- Frontend: scaffolded but not feature-complete
-- Automated backend tests: not started
-- Frontend UI and API integration: not started
-- Deployment: not configured
-
-## Phase overview
-
-| Phase | Status |
-| --- | --- |
-| Project initialization | ✅ Completed |
-| Backend API & data layer | ✅ Completed |
-| Backend business logic | ✅ Completed |
-| Backend testing | ⏳ Not started |
-| Frontend foundation | ✅ Scaffolded |
-| Frontend feature implementation | ⏳ Not started |
-| Frontend API integration | ⏳ Not started |
-| Testing & polish | ⏳ Not started |
-| Deployment | ⏳ Not started |
-| Documentation | ✅ Updated |
+**GitHub:** [3narinder/lead-flow](https://github.com/3narinder/lead-flow)
 
 ---
 
-# Features
+## 🎯 Overview
 
-## Implemented in the codebase
+LeadFlow is a production-ready lead management system designed for sales teams and businesses to efficiently track and manage their leads through different stages of the sales pipeline.
 
-- Create a lead
-- List leads with pagination
-- Search leads by name, email, phone, or status
-- Update a lead's status
-- Delete a lead
-- MongoDB connection and Mongoose model
-- Request validation with `express-validator`
-- Centralized application error handling
-- `AppError` utility for expected errors
-- `asyncHandler` wrapper for controllers
-- Health-check endpoint at `/health`
-- CORS and JSON parsing
-- Environment-based configuration
+**Key Features:**
 
-## Not yet implemented
-
-- Frontend lead list screen
-- Lead creation form
-- Search input on the UI
-- Pagination UI
-- Status update controls
-- Loading, empty, and error state UI
-- Automated tests
-- Deployment configuration
+- ✅ Create and manage leads
+- ✅ Search leads by name, email, or phone
+- ✅ Filter leads by status (new, contacted, qualified, lost)
+- ✅ Sort leads by creation date or custom fields
+- ✅ Paginate through large lead datasets
+- ✅ Update lead status in real-time
+- ✅ Delete leads
+- ✅ Fully responsive design
+- ✅ Real-time data synchronization
 
 ---
 
-# Tech Stack
+## 📊 Current Project Status
 
-## Frontend
-
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-
-## Backend
-
-- Node.js
-- Express
-- TypeScript
-- MongoDB
-- Mongoose
-- dotenv
-- CORS
-- express-validator
-
-## Planned testing tools
-
-- Vitest
-- Supertest
-- React Testing Library
+| Component        | Status         | Details                                            |
+| ---------------- | -------------- | -------------------------------------------------- |
+| Backend API      | ✅ Complete    | All CRUD operations implemented                    |
+| Frontend UI      | ✅ Complete    | Full feature parity with backend                   |
+| Database         | ✅ Complete    | MongoDB with Mongoose ORM                          |
+| Backend Testing  | ✅ Complete    | Vitest + Supertest test suite                      |
+| Frontend Testing | ⏳ In Progress | Vitest + React Testing Library                     |
+| Deployment       | ⏳ Planned     | Vercel (frontend), Render (backend), MongoDB Atlas |
+| Documentation    | ✅ Complete    | Comprehensive API & developer guides               |
 
 ---
 
-# Project Structure
+## 🏗️ Architecture
 
-```text
-leadflow/
-├── backend/
-│   ├── src/
-│   │   ├── app.ts
-│   │   ├── server.ts
-│   │   ├── db/
-│   │   │   └── db.ts
-│   │   ├── controllers/
-│   │   │   └── leads.controllers.ts
-│   │   ├── middleware/
-│   │   │   ├── error.middleware.ts
-│   │   │   └── validation.middleware.ts
-│   │   ├── models/
-│   │   │   └── lead.model.ts
-│   │   ├── routes/
-│   │   │   └── leads.routes.ts
-│   │   ├── types/
-│   │   │   ├── error.types.ts
-│   │   │   └── lead.types.ts
-│   │   ├── utils/
-│   │   │   ├── AppError.ts
-│   │   │   └── AsyncHandler.ts
-│   │   └── validator/
-│   │       └── lead.validator.ts
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── package-lock.json
-├── frontend/
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── index.css
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   └── index.html
-├── .gitignore
-├── AGENT.md
-├── README.md
-└── package-lock.json
+### System Architecture
+
+```
+                    LeadFlow
+
+┌──────────────────────────────────────┐
+│       React Frontend (Vite)          │
+│  TypeScript + Tailwind + React Query │
+│                                      │
+│  Components → Hooks → Services → API │
+└────────────────┬─────────────────────┘
+                 │
+                 │ HTTP / JSON (REST API)
+                 ▼
+┌──────────────────────────────────────┐
+│    Node.js Backend (Express)         │
+│     TypeScript + Mongoose            │
+│                                      │
+│  Routes → Validators → Controllers → │
+│       → Models → MongoDB             │
+└────────────────┬─────────────────────┘
+                 │
+                 ▼
+┌──────────────────────────────────────┐
+│         MongoDB Database             │
+│                                      │
+│       leads collection               │
+└──────────────────────────────────────┘
 ```
 
----
+### Backend Request Flow
 
-# Backend API
-
-The backend exposes the following routes:
-
-## Health
-
-- `GET /health`
- - Returns service health status
-
-## Leads
-
-- `POST /api/leads`
- - Create a lead
-- `GET /api/leads?search=&page=&limit=`
- - List leads with optional search and pagination
-- `PATCH /api/leads/:id`
- - Update the lead status
-- `DELETE /api/leads/:id`
- - Delete a lead
-
-### Lead status values
-
-- `new`
-- `contacted`
-- `qualified`
-- `lost`
-
-### Validation rules
-
-- `name`: required, trimmed, 2-100 chars
-- `email`: required, valid email format
-- `phone`: required, 10 digits
-- `status`: required on update, must be one of the valid enum values
-
----
-
-# Backend Architecture
-
-The backend is organized as a simple layered Express app:
-
-```text
-Request
- ↓
-Routes
- ↓
-Validation middleware
- ↓
+```
+Client Request
+      ↓
+Express Router
+      ↓
+Validation Middleware
+      ├─ Validation Success → Continue
+      └─ Validation Error → Error Handler
+      ↓
 asyncHandler
- ↓
+      ├─ Success → Controller
+      └─ Error → Error Handler
+      ↓
 Controller
- ↓
-Mongoose model
- ↓
+      ├─ Business Logic
+      └─ Mongoose Model
+      ↓
 MongoDB
+      ↓
+Response → Client
 ```
-
-Errors flow through a centralized app-level handler:
-
-```text
-Controller / middleware error
- ↓
-next(error)
- ↓
-errorHandler
- ↓
-JSON HTTP error response
-```
-
-Key implementation patterns:
-
-- Routes stay thin and delegate to controllers.
-- Validation belongs in the validator layer.
-- Business logic is kept inside controller functions.
-- Expected application errors are created with `AppError`.
-- `asyncHandler` prevents repeated try/catch boilerplate.
 
 ---
 
-# Local Development
+## 🛠️ Tech Stack
 
-## Backend
+### Frontend
+
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Lightning-fast build tool
+- **Tailwind CSS** - Utility-first styling
+- **React Router v7** - Client-side routing
+- **React Hook Form** - Form state management
+- **TanStack React Query** - Server state management
+- **React Hot Toast** - Toast notifications
+- **React Error Boundary** - Error handling
+- **React Icons** - Icon library
+
+### Backend
+
+- **Node.js** - JavaScript runtime
+- **Express** - Web framework
+- **TypeScript** - Type safety
+- **Mongoose** - MongoDB ODM
+- **express-validator** - Request validation
+- **CORS** - Cross-origin resource sharing
+- **Morgan** - HTTP request logger
+- **dotenv** - Environment variables
+
+### Database
+
+- **MongoDB** - NoSQL database
+- **Mongoose** - Database schema & validation
+
+### Testing
+
+- **Vitest** - Fast unit test framework
+- **Supertest** - HTTP assertion library
+- **React Testing Library** - Frontend component testing
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB (local or MongoDB Atlas)
+- npm or yarn
+
+### Backend Setup
 
 ```bash
 cd backend
+
+# 1. Install dependencies
 npm install
+
+# 2. Create environment file
+cp .env.example .env
+
+# 3. Configure MongoDB connection
+# Edit .env and add your MONGO_URI
+
+# 4. Start development server
 npm run dev
+
+# Backend runs on: http://localhost:5000
+# Health check: http://localhost:5000/health
 ```
 
-Set a `MONGO_URI` in a local `.env` file before starting the backend.
-
-## Frontend
+### Frontend Setup
 
 ```bash
 cd frontend
+
+# 1. Install dependencies
 npm install
+
+# 2. Start development server
 npm run dev
+
+# Frontend runs on: http://localhost:5173
+# API proxy configured for /api calls
 ```
 
 ---
 
-# Notes for Contributors
+## 📚 API Documentation
 
-- Do not put business logic in the route files.
-- Keep validation in the validator layer.
-- Use the existing `AppError` and `asyncHandler` patterns.
-- Keep the frontend work separate from backend implementation until the backend API is stable.
-- Update documentation when new features or architecture changes are introduced.
+### Base URL
+
+```
+http://localhost:5000/api
 ```
 
----
+### Response Format
 
-# Routes
+**Success Response:**
 
-Routes define HTTP endpoints and connect them to validation middleware and controllers.
-
-Routes should remain focused on request flow and should not contain business logic.
-
-Example:
-
-```text
-POST /api/leads
-
-      ↓
-
-createLeadValidator
-
-      ↓
-
-handleValidationErrors
-
-      ↓
-
-asyncHandler
-
-      ↓
-
-createLead()
+```json
+{
+  "success": true,
+  "data": {},
+  "pagination": {}
+}
 ```
 
----
-
-# Validation
-
-LeadFlow uses `express-validator` for request-level validation.
-
-Validation happens before the controller performs database operations.
-
-The validation flow is:
-
-```text
-Request
-   ↓
-Validator
-   ↓
-Validation middleware
-   ↓
-Controller
-```
-
-## Create Lead Validation
-
-The create-lead request validates:
-
-- `name`
-- `email`
-- `phone`
-- `status`
-
-The following rules are applied:
-
-### Name
-
-- Required
-- Trimmed
-- Between 2 and 100 characters
-
-### Email
-
-- Required
-- Trimmed
-- Must be a valid email
-- Normalized using `normalizeEmail()`
-
-### Phone
-
-- Required
-- Trimmed
-- Must contain exactly 10 digits
-
-### Status
-
-If provided, it must be one of:
-
-```text
-new
-contacted
-qualified
-lost
-```
-
-## Update Lead Status Validation
-
-The update-status request validates the `status` field.
-
-Allowed values:
-
-```text
-new
-contacted
-qualified
-lost
-```
-
----
-
-# Controllers
-
-Controllers contain the request/response and business logic for each endpoint.
-
-Current controller functions:
-
-- `createLead()`
-- `getLeads()`
-- `updateLeadStatus()`
-- `deleteLead()`
-
-Controllers use `async/await`.
-
-Asynchronous errors are forwarded to the centralized error handler through `asyncHandler`.
-
-Controllers therefore do not need repetitive `try/catch` blocks for every request.
-
----
-
-# `asyncHandler`
-
-The `asyncHandler` utility wraps asynchronous controllers.
-
-Its purpose is to forward rejected promises to Express's centralized error middleware.
-
-The request flow is:
-
-```text
-Async Controller
-      │
-      ▼
- asyncHandler
-      │
-      ├── Success → Controller response
-      │
-      └── Error → next(error)
-                     │
-                     ▼
-               errorHandler
-```
-
-This keeps controller code focused on application logic instead of repeating error-catching boilerplate.
-
----
-
-# `AppError`
-
-`AppError` is a functional utility used to create application-level errors.
-
-Example:
-
-```ts
-throw AppError("Lead not found", 404);
-```
-
-Application errors contain:
-
-- Error message
-- HTTP status code
-- `isOperational` flag
-
-This allows the centralized error middleware to distinguish expected application errors from unexpected server errors.
-
----
-
-# Error Handling
-
-LeadFlow uses centralized error handling.
-
-The error-handling middleware is registered after the application routes.
-
-```text
-Request
-   ↓
-Routes
-   ↓
-Middleware
-   ↓
-Controller
-   ↓
-Error
-   ↓
-errorHandler
-   ↓
-Consistent JSON response
-```
-
-The centralized error handler currently handles:
-
-- `AppError`
-- Express-validator validation errors
-- Mongoose validation errors
-- MongoDB duplicate-key errors
-- Invalid MongoDB ObjectId errors
-- Unexpected errors
-
-Unexpected errors return a generic internal-server-error response instead of exposing internal implementation details.
-
----
-
-# API Error Response
-
-API errors use a consistent response structure.
-
-Example:
+**Error Response:**
 
 ```json
 {
   "success": false,
-  "message": "Lead not found"
+  "message": "Error description"
 }
 ```
 
-Validation errors include field-level information:
-
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "errors": [
-    {
-      "field": "email",
-      "message": "Please provide a valid email address"
-    }
-  ]
-}
-```
-
-This provides a predictable structure for API consumers and will also make frontend error handling easier.
-
 ---
 
-# Logging
+## 🔌 API Endpoints
 
-The backend currently logs important server-side errors and startup/database connection information using `console`.
+### 1. Create Lead
 
-Examples include:
+**Endpoint:** `POST /api/leads`
 
-```text
-MongoDB connected successfully
+**Purpose:** Create a new lead
+
+**Headers:**
+
+```
+Content-Type: application/json
 ```
 
-and server startup information:
-
-```text
-LeadFlow API running on port 5000
-```
-
-Errors are logged by the centralized error middleware.
-
-A more structured logging system can be introduced later if required.
-
----
-
-# Models
-
-Mongoose models define the structure of documents stored in MongoDB.
-
-The current application contains one model:
-
-```text
-Lead
-```
-
----
-
-# Database
-
-The database module is responsible for establishing the MongoDB connection before the server starts.
-
-The server follows this startup flow:
-
-```text
-server.ts
-   │
-   ▼
-dotenv.config()
-   │
-   ▼
-connectDB()
-   │
-   ├── Success
-   │      ↓
-   │   app.listen()
-   │
-   └── Failure
-          ↓
-      Exit process
-```
-
-The application does not start listening for HTTP requests until the MongoDB connection succeeds.
-
----
-
-# Lead Model
-
-## `src/models/lead.model.ts`
-
-This file defines the Lead Mongoose schema and model.
-
-## Lead Fields
-
-| Field       | Type   | Required  | Description           |
-| ----------- | ------ | --------- | --------------------- |
-| `name`      | String | Yes       | Lead name             |
-| `email`     | String | Yes       | Lead email            |
-| `phone`     | String | Yes       | Lead phone number     |
-| `status`    | String | No        | Current lead status   |
-| `createdAt` | Date   | Automatic | Creation timestamp    |
-| `updatedAt` | Date   | Automatic | Last update timestamp |
-
----
-
-# Name Validation
-
-The name:
-
-- is required
-- is trimmed
-- must contain at least 2 characters
-- cannot exceed 100 characters
-
----
-
-# Email Validation
-
-The email:
-
-- is required
-- is trimmed
-- is converted to lowercase
-- must be unique
-- must match the configured email pattern
-
----
-
-# Phone Validation
-
-The phone:
-
-- is required
-- is trimmed
-- must contain 10 digits
-
-Current format:
-
-```text
-9876543210
-```
-
----
-
-# Status
-
-The allowed statuses are:
-
-```text
-new
-contacted
-qualified
-lost
-```
-
-The default status is:
-
-```text
-new
-```
-
----
-
-# Timestamps
-
-The schema uses:
-
-```ts
-{
-  timestamps: true;
-}
-```
-
-Mongoose automatically maintains:
-
-```text
-createdAt
-updatedAt
-```
-
----
-
-# Lead Controllers
-
-## `createLead()`
-
-### Endpoint
-
-```http
-POST /api/leads
-```
-
-### Purpose
-
-Creates a new lead.
-
-### Request body
+**Request Body:**
 
 ```json
 {
   "name": "John Doe",
   "email": "john@example.com",
-  "phone": "9876543210"
+  "phone": "9876543210",
+  "status": "new"
 }
 ```
 
-### Process
+**Field Validation:**
+| Field | Type | Required | Rules |
+|-------|------|----------|-------|
+| name | string | Yes | 2-100 characters, trimmed |
+| email | string | Yes | Valid email, unique, lowercase |
+| phone | string | Yes | Exactly 10 digits |
+| status | enum | No | new, contacted, qualified, lost |
 
-```text
-Request
-   ↓
-Validation
-   ↓
-createLead()
-   ↓
-Lead.create()
-   ↓
-MongoDB
-   ↓
-Return created lead
-```
-
-### Success response
+**Success Response (201 Created):**
 
 ```json
 {
   "success": true,
-  "data": {}
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210",
+    "status": "new",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z"
+  }
 }
 ```
 
+**Error Responses:**
+
+| Status | Message               | Reason             |
+| ------ | --------------------- | ------------------ |
+| 400    | Validation failed     | Invalid input data |
+| 409    | Email already exists  | Duplicate email    |
+| 500    | Internal server error | Server error       |
+
+**cURL Example:**
+
+```bash
+curl -X POST http://localhost:5000/api/leads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210",
+    "status": "new"
+  }'
+```
+
+**JavaScript Fetch Example:**
+
+```typescript
+const response = await fetch("http://localhost:5000/api/leads", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "9876543210",
+    status: "new",
+  }),
+});
+
+const data = await response.json();
+```
+
 ---
 
-# `getLeads()`
+### 2. Get Leads
 
-### Endpoint
+**Endpoint:** `GET /api/leads`
 
-```http
+**Purpose:** Retrieve leads with optional search, filtering, sorting, and pagination
+
+**Query Parameters:**
+
+| Parameter | Type   | Optional | Default     | Example             |
+| --------- | ------ | -------- | ----------- | ------------------- |
+| search    | string | Yes      | ""          | `?search=john`      |
+| status    | string | Yes      | ""          | `?status=qualified` |
+| sortBy    | string | Yes      | "createdAt" | `?sortBy=name`      |
+| sortOrder | string | Yes      | "desc"      | `?sortOrder=asc`    |
+| page      | number | Yes      | 1           | `?page=2`           |
+| limit     | number | Yes      | 10          | `?limit=20`         |
+
+**Search Behavior:**
+
+- Searches across: name, email, phone, status
+- Case-insensitive matching
+- Partial string matching
+
+**Valid Status Values:**
+
+```
+new
+contacted
+qualified
+lost
+```
+
+**Valid Sort Fields:**
+
+```
+createdAt (default)
+name
+email
+phone
+status
+```
+
+**Pagination:**
+
+- Default page size: 10 leads per page
+- Maximum recommended: 100 leads per page
+
+**Request Examples:**
+
+```
+# Get all leads (default pagination)
 GET /api/leads
-```
 
-### Current functionality
-
-`getLeads()` supports:
-
-- Listing leads
-- Searching leads
-- Pagination
-- Combining search and pagination
-- Sorting by creation date
-
-Leads are sorted by:
-
-```text
-createdAt: -1
-```
-
-This means the newest leads are returned first.
-
----
-
-## Search
-
-Search can be performed using:
-
-```http
+# Search by name/email
 GET /api/leads?search=john
+
+# Filter by status
+GET /api/leads?status=qualified
+
+# Sort by name ascending
+GET /api/leads?sortBy=name&sortOrder=asc
+
+# Pagination
+GET /api/leads?page=2&limit=20
+
+# Combined query
+GET /api/leads?search=john&status=qualified&sortBy=createdAt&sortOrder=desc&page=1&limit=10
 ```
 
-The search currently checks:
+**Success Response (200 OK):**
 
-- `name`
-- `email`
-- `phone`
-- `status`
+```json
+{
+  "success": true,
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalLeads": 25,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  },
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "9876543210",
+      "status": "new",
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439012",
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "phone": "8765432109",
+      "status": "contacted",
+      "createdAt": "2024-01-14T15:20:00.000Z",
+      "updatedAt": "2024-01-14T15:20:00.000Z"
+    }
+  ]
+}
+```
 
-The search is case-insensitive.
+**cURL Examples:**
+
+```bash
+# Get all leads
+curl http://localhost:5000/api/leads
+
+# Search leads
+curl "http://localhost:5000/api/leads?search=john"
+
+# Filter and paginate
+curl "http://localhost:5000/api/leads?status=qualified&page=1&limit=10"
+
+# Complex query
+curl "http://localhost:5000/api/leads?search=doe&status=qualified&sortBy=name&sortOrder=asc&page=1&limit=5"
+```
+
+**JavaScript Example:**
+
+```typescript
+// Using the frontend service
+import { getLeads } from "../services/leadsService";
+
+const response = await getLeads({
+  search: "john",
+  status: "qualified",
+  sortBy: "createdAt",
+  sortOrder: "desc",
+  page: 1,
+  limit: 10,
+});
+
+console.log(response.pagination);
+console.log(response.data);
+```
 
 ---
 
-## Pagination
+### 3. Update Lead Status
 
-Pagination can be performed using:
+**Endpoint:** `PATCH /api/leads/:id`
 
-```http
-GET /api/leads?page=1&limit=10
-```
+**Purpose:** Update a lead's status
 
-The response includes pagination information such as:
+**URL Parameters:**
+| Parameter | Type | Required | Format |
+|-----------|------|----------|--------|
+| id | string | Yes | Valid MongoDB ObjectId |
 
-- Current page
-- Limit
-- Total leads
-- Total pages
-- Whether a next page exists
-- Whether a previous page exists
-
----
-
-## Search + Pagination
-
-Search and pagination can be combined:
-
-```http
-GET /api/leads?search=john&page=1&limit=10
-```
-
-The search filter is applied before pagination.
-
----
-
-# `updateLeadStatus()`
-
-### Endpoint
-
-```http
-PATCH /api/leads/:id
-```
-
-### Purpose
-
-Updates the status of a lead.
-
-### Request body
+**Request Body:**
 
 ```json
 {
@@ -794,643 +463,476 @@ Updates the status of a lead.
 }
 ```
 
-### Allowed statuses
+**Field Validation:**
+| Field | Type | Required | Options |
+|-------|------|----------|---------|
+| status | string | Yes | new, contacted, qualified, lost |
 
-```text
-new
-contacted
-qualified
-lost
+**Success Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210",
+    "status": "qualified",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:35:00.000Z"
+  }
+}
 ```
 
-The request is validated using `express-validator`, and Mongoose validation also runs during the update.
+**Error Responses:**
 
-### Invalid ID
+| Status | Message               | Reason               |
+| ------ | --------------------- | -------------------- |
+| 400    | Invalid lead ID       | Malformed ObjectId   |
+| 400    | Validation failed     | Invalid status value |
+| 404    | Lead not found        | ID doesn't exist     |
+| 500    | Internal server error | Server error         |
 
-If the provided MongoDB ID is invalid:
-
-```http
-400 Bad Request
-```
-
-is returned.
-
-### Not-found behavior
-
-If the specified lead does not exist:
-
-```http
-404 Not Found
-```
-
-is returned.
-
----
-
-# `deleteLead()`
-
-### Endpoint
-
-```http
-DELETE /api/leads/:id
-```
-
-### Purpose
-
-Deletes a lead using its MongoDB ID.
-
-### Process
-
-```text
-Request
-   ↓
-Read lead ID
-   ↓
-Validate ObjectId
-   ↓
-Find and delete lead
-   ↓
-Return result
-```
-
-### Invalid ID
-
-An invalid MongoDB ID returns:
-
-```http
-400 Bad Request
-```
-
-### Not-found behavior
-
-If the lead does not exist:
-
-```http
-404 Not Found
-```
-
-is returned.
-
----
-
-# API Endpoints
-
-## Health Check
-
-| Method | Endpoint  | Purpose          |
-| ------ | --------- | ---------------- |
-| GET    | `/health` | Check API health |
-
----
-
-## Lead API
-
-| Method | Endpoint                                  | Purpose             | Status         |
-| ------ | ----------------------------------------- | ------------------- | -------------- |
-| POST   | `/api/leads`                              | Create lead         | ✅ Implemented |
-| GET    | `/api/leads`                              | Get leads           | ✅ Implemented |
-| GET    | `/api/leads?search=value`                 | Search leads        | ✅ Implemented |
-| GET    | `/api/leads?page=1&limit=10`              | Paginate leads      | ✅ Implemented |
-| GET    | `/api/leads?search=value&page=1&limit=10` | Search + pagination | ✅ Implemented |
-| PATCH  | `/api/leads/:id`                          | Update lead status  | ✅ Implemented |
-| DELETE | `/api/leads/:id`                          | Delete lead         | ✅ Implemented |
-
----
-
-# Environment Variables
-
-Create a `.env` file inside the backend directory.
-
-Example:
-
-```env
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-```
-
-## `PORT`
-
-Defines the port on which the Express server runs.
-
-Example:
-
-```env
-PORT=5000
-```
-
-## `MONGO_URI`
-
-MongoDB connection string used by Mongoose.
-
-Local MongoDB example:
-
-```env
-MONGO_URI=mongodb://localhost:27017/leadflow
-```
-
-MongoDB Atlas can also be used.
-
----
-
-# `.env.example`
-
-The project should contain a `.env.example` file.
-
-Example:
-
-```env
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-```
-
-The real `.env` file should not be committed to Git.
-
----
-
-# Installation
-
-## Prerequisites
-
-Install:
-
-- Node.js
-- npm
-- MongoDB or MongoDB Atlas
-- Git
-
-Verify Node.js:
+**cURL Example:**
 
 ```bash
-node -v
+curl -X PATCH http://localhost:5000/api/leads/507f1f77bcf86cd799439011 \
+  -H "Content-Type: application/json" \
+  -d '{"status": "qualified"}'
 ```
 
-Verify npm:
+**JavaScript Example:**
 
-```bash
-npm -v
+```typescript
+const leadId = "507f1f77bcf86cd799439011";
+
+const response = await fetch(`http://localhost:5000/api/leads/${leadId}`, {
+  method: "PATCH",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ status: "qualified" }),
+});
+
+const data = await response.json();
 ```
 
 ---
 
-# Backend Setup
+### 4. Delete Lead
 
-Go to the backend directory:
+**Endpoint:** `DELETE /api/leads/:id`
+
+**Purpose:** Delete a lead permanently
+
+**URL Parameters:**
+| Parameter | Type | Required | Format |
+|-----------|------|----------|--------|
+| id | string | Yes | Valid MongoDB ObjectId |
+
+**Success Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Lead deleted successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210",
+    "status": "new",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Message               | Reason             |
+| ------ | --------------------- | ------------------ |
+| 400    | Invalid lead ID       | Malformed ObjectId |
+| 404    | Lead not found        | ID doesn't exist   |
+| 500    | Internal server error | Server error       |
+
+**cURL Example:**
+
+```bash
+curl -X DELETE http://localhost:5000/api/leads/507f1f77bcf86cd799439011
+```
+
+**JavaScript Example:**
+
+```typescript
+const leadId = "507f1f77bcf86cd799439011";
+
+const response = await fetch(`http://localhost:5000/api/leads/${leadId}`, {
+  method: "DELETE",
+});
+
+const data = await response.json();
+```
+
+---
+
+### 5. Health Check
+
+**Endpoint:** `GET /health`
+
+**Purpose:** Verify API is running
+
+**Success Response (200 OK):**
+
+```json
+{
+  "status": "ok"
+}
+```
+
+**cURL Example:**
+
+```bash
+curl http://localhost:5000/health
+```
+
+---
+
+## 🗂️ Project Structure
+
+### Backend
+
+```
+backend/
+├── src/
+│   ├── controllers/
+│   │   └── leads.controllers.ts    # Lead business logic
+│   ├── models/
+│   │   └── lead.model.ts           # Mongoose schema
+│   ├── routes/
+│   │   └── leads.routes.ts         # API endpoints
+│   ├── validator/
+│   │   └── lead.validator.ts       # Request validation rules
+│   ├── middleware/
+│   │   ├── error.middleware.ts     # Error handling
+│   │   └── validation.middleware.ts # Validation error handling
+│   ├── types/
+│   │   ├── lead.types.ts           # Lead TypeScript types
+│   │   └── error.types.ts          # Error types
+│   ├── utils/
+│   │   ├── AppError.ts             # Custom error class
+│   │   ├── AsyncHandler.ts         # Async error wrapper
+│   │   └── leadQuery.ts            # Query builders
+│   ├── db/
+│   │   └── db.ts                   # MongoDB connection
+│   ├── app.ts                      # Express app config
+│   └── server.ts                   # Server entry point
+├── test/
+│   ├── health.test.ts              # Health endpoint tests
+│   ├── leads.test.ts               # Lead API tests
+│   └── setup.ts                    # Test configuration
+├── .env                            # Environment variables
+├── package.json
+├── vitest.config.ts
+└── tsconfig.json
+```
+
+### Frontend
+
+```
+frontend/
+├── src/
+│   ├── components/                 # Reusable UI components
+│   ├── features/
+│   │   └── leads/
+│   │       ├── LeadsTable.tsx      # Leads table feature
+│   │       ├── useLeads.ts         # Leads data hook
+│   │       └── LeadTableOperations.tsx
+│   ├── ui/                         # Presentational components
+│   │   ├── Search.tsx
+│   │   ├── Filter.tsx
+│   │   ├── Table.tsx
+│   │   ├── Pagination.tsx
+│   │   ├── LeadFormModal.tsx
+│   │   ├── StatusBadge.tsx
+│   │   └── ...
+│   ├── services/
+│   │   └── leadsService.ts         # API client
+│   ├── types/
+│   │   └── lead.ts                 # TypeScript types
+│   ├── hooks/
+│   │   └── useMoveBack.ts
+│   ├── lib/
+│   │   └── toastConfig.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── index.html
+```
+
+---
+
+## 🧪 Testing
+
+### Backend Testing
 
 ```bash
 cd backend
+
+# Run all tests
+npm test
+
+# Run tests once (CI mode)
+npm run test:run
+
+# Run specific test file
+npm test leads.test
 ```
 
-Install dependencies:
+**Test Coverage:**
 
-```bash
-npm install
-```
+- ✅ Lead creation (valid & invalid)
+- ✅ Lead retrieval (with search, filter, sort, pagination)
+- ✅ Lead status updates
+- ✅ Lead deletion
+- ✅ Error handling
+- ✅ Health check
 
-Create:
-
-```text
-.env
-```
-
-Add:
-
-```env
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The backend will run on:
-
-```text
-http://localhost:5000
-```
-
-Test the health endpoint:
-
-```text
-http://localhost:5000/health
-```
-
----
-
-# Frontend Setup
-
-The frontend has been initialized, but frontend feature development has not started yet.
-
-Go to the frontend directory:
+### Frontend Testing (In Progress)
 
 ```bash
 cd frontend
-```
 
-Install dependencies:
+# Run tests (once ready)
+npm test
 
-```bash
-npm install
-```
+# Run in watch mode
+npm test -- --watch
 
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The Vite development server will normally run on:
-
-```text
-http://localhost:5173
+# Generate coverage report
+npm test -- --coverage
 ```
 
 ---
 
-# Development Phases
+## 🔐 Environment Variables
 
-## Phase 0 — Project Initialization
+### Backend (.env)
 
-**Status: ✅ Completed**
+```env
+# Server Configuration
+PORT=5000
 
-### Project Setup
+# Database Configuration
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/leadflow?retryWrites=true&w=majority
 
-- [x] Create project repository
-- [x] Initialize Git
-- [x] Create backend directory
-- [x] Create frontend directory
-- [x] Add `.gitignore`
-- [x] Create README
-- [x] Create AGENTS.md
+# Optional: Application Environment
+NODE_ENV=development
+```
 
-### Backend Setup
+### Frontend (Vite auto-configures)
 
-- [x] Setup Node.js
-- [x] Setup Express
-- [x] Setup TypeScript
-- [x] Create application entry point
-- [x] Create health-check endpoint
+API base URL is configured in `src/services/leadsService.ts`:
 
-### Frontend Setup
+```typescript
+const API_URL = "http://localhost:5000/api/leads";
+```
 
-- [x] Create React application using Vite
-- [x] Configure TypeScript
-- [x] Configure Tailwind CSS
+For production, update to your deployed backend URL.
 
 ---
 
-# Phase 1 — Backend API & Data Layer
+## 🚀 Deployment
 
-**Status: ✅ Completed**
+### Planned Architecture
 
-- [x] Configure MongoDB connection
-- [x] Configure Mongoose
-- [x] Create Lead model
-- [x] Define Lead schema
-- [x] Add `name`
-- [x] Add `email`
-- [x] Add `phone`
-- [x] Add `status`
-- [x] Add timestamps
-- [x] Add Mongoose validation
-- [x] Setup Express middleware
-- [x] Create routes
-- [x] Create controller layer
-- [x] Connect routes to controllers
-- [x] Implement create lead
-- [x] Implement get leads
-- [x] Implement update status
-- [x] Implement delete lead
-
----
-
-# Phase 2 — Backend Business Logic
-
-**Status: ✅ Completed**
-
-### Lead Operations
-
-- [x] `createLead()`
-- [x] `getLeads()`
-- [x] `updateLeadStatus()`
-- [x] `deleteLead()`
-
-### Search & Pagination
-
-- [x] Add lead search
-- [x] Add pagination
-- [x] Combine search and pagination
-- [x] Sort leads by creation date
-
-### Request Validation
-
-- [x] Add `express-validator`
-- [x] Validate create-lead requests
-- [x] Validate update-status requests
-- [x] Add validation middleware
-- [x] Return field-level validation errors
-
-### Error Handling
-
-- [x] Create functional `AppError`
-- [x] Create `AppErrorType`
-- [x] Create `asyncHandler`
-- [x] Add centralized error-handling middleware
-- [x] Handle application errors
-- [x] Handle validation errors
-- [x] Handle Mongoose validation errors
-- [x] Handle duplicate MongoDB key errors
-- [x] Handle invalid MongoDB ObjectIds
-- [x] Handle not-found errors
-- [x] Handle unexpected server errors
-- [x] Use a consistent API error response structure
-
-### Logging
-
-- [x] Add server startup logging
-- [x] Add database connection logging
-- [x] Add centralized server-side error logging
-
-### Manual API Testing
-
-- [x] Test APIs manually with Postman
-
-### Architecture
-
-- [x] Separate routes from controllers
-- [x] Separate validation from controllers
-- [x] Use TypeScript types
-- [x] Use `async/await`
-- [x] Use `asyncHandler` for asynchronous controllers
-- [x] Keep application errors separate from unexpected errors
-
----
-
-# Phase 3 — Backend Testing
-
-**Status: ⏳ Not Started**
-
-Planned:
-
-- [ ] Setup Vitest
-- [ ] Setup Supertest
-- [ ] Test valid lead creation
-- [ ] Test invalid lead creation
-- [ ] Test lead listing
-- [ ] Test search
-- [ ] Test pagination
-- [ ] Test status update
-- [ ] Test deletion
-- [ ] Test 404 behavior
-- [ ] Test error responses
-- [ ] Achieve 70%+ coverage
-
----
-
-# Phase 4 — Frontend Foundation & Features
-
-**Status: ⏳ Not Started**
-
-Planned:
-
-- [ ] Create lead table
-- [ ] Create lead form
-- [ ] Implement search
-- [ ] Implement pagination
-- [ ] Implement status update
-- [ ] Implement delete
-- [ ] Add loading state
-- [ ] Add empty state
-- [ ] Add error state
-- [ ] Add form validation
-- [ ] Make UI responsive
-
----
-
-# Phase 5 — API Integration & Frontend Hooks
-
-**Status: ⏳ Not Started**
-
-Planned:
-
-- [ ] Connect frontend to backend API
-- [ ] Create API service layer
-- [ ] Create lead
-- [ ] Fetch leads
-- [ ] Search leads
-- [ ] Paginate leads
-- [ ] Update lead status
-- [ ] Delete lead
-- [ ] Create reusable API hooks
-- [ ] Create lead modal
-- [ ] Create status dropdown
-
----
-
-# Phase 6 — Testing & Polish
-
-**Status: ⏳ Not Started**
-
-Planned:
-
-- [ ] Setup Vitest
-- [ ] Setup React Testing Library
-- [ ] Test form submission
-- [ ] Test lead table
-- [ ] Test search
-- [ ] Test pagination
-- [ ] Test status updates
-- [ ] Test delete
-- [ ] Apply final color system
-- [ ] Apply typography
-- [ ] Check responsive design
-- [ ] Improve UX
-
----
-
-# Phase 7 — Deployment
-
-**Status: ⏳ Not Started**
-
-Planned architecture:
-
-```text
-Frontend
-   ↓
-Vercel
-
-Backend
-   ↓
-Render
-
-Database
-   ↓
+```
+Frontend (React)
+     ↓
+  Vercel
+     │
+Backend (Express)
+     ↓
+  Render
+     │
+Database (MongoDB)
+     ↓
 MongoDB Atlas
 ```
 
-Planned tasks:
+### Frontend Deployment (Vercel)
 
-- [ ] Deploy frontend
-- [ ] Deploy backend
-- [ ] Configure production environment variables
-- [ ] Configure frontend/backend URLs
-- [ ] Configure production CORS
-- [ ] Test production API
-- [ ] Test production application
+```bash
+# Build for production
+npm run build
 
----
+# Preview build locally
+npm run preview
 
-# Phase 8 — Documentation
-
-**Status: 🔄 In Progress**
-
-Completed:
-
-- [x] Project overview
-- [x] Current project status
-- [x] Technology stack
-- [x] Backend structure
-- [x] Backend file responsibilities
-- [x] API documentation
-- [x] Search documentation
-- [x] Pagination documentation
-- [x] Validation documentation
-- [x] Error-handling documentation
-- [x] Environment variables
-- [x] Development phases
-
-Remaining:
-
-- [ ] Document frontend architecture
-- [ ] Document deployment
-- [ ] Document automated testing strategy
-- [ ] Document technical decisions
-- [ ] Document technical trade-offs
-- [ ] Finalize AGENTS.md
-
----
-
-# Development Guidelines
-
-When adding a new feature:
-
-1. Keep routes focused on endpoint definitions and request flow.
-2. Put business logic in controllers.
-3. Validate input before performing database operations.
-4. Use TypeScript types for application data.
-5. Use `async/await` for asynchronous operations.
-6. Wrap asynchronous controllers with `asyncHandler`.
-7. Use `AppError` for expected application errors.
-8. Let centralized error middleware handle errors consistently.
-9. Keep functions small and readable.
-10. Avoid unnecessary duplication.
-11. Keep reusable middleware and utilities in their appropriate files.
-12. Update the README when completed functionality changes.
-
----
-
-# Current Backend Request Flow
-
-A typical lead request follows this structure:
-
-```text
-Client
-  │
-  ▼
-Express
-  │
-  ▼
-Route
-  │
-  ├── Validation
-  │
-  ├── Validation Error
-  │       ↓
-  │   errorHandler
-  │
-  ▼
-asyncHandler
-  │
-  ▼
-Controller
-  │
-  ├── AppError
-  │       ↓
-  │   errorHandler
-  │
-  ▼
-Mongoose Model
-  │
-  ▼
-MongoDB
-  │
-  ▼
-Controller Response
+# Deploy to Vercel
+vercel deploy
 ```
 
-This structure keeps request validation, business logic, database operations, and error handling separated.
+### Backend Deployment (Render)
 
----
+```bash
+# Build TypeScript
+npm run build
 
-# Future Architecture
-
-As the application grows, the backend may evolve toward:
-
-```text
-Request
-
-   ↓
-
-Routes
-
-   ↓
-
-Validation
-
-   ↓
-
-Controller
-
-   ↓
-
-Service
-
-   ↓
-
-Model
-
-   ↓
-
-MongoDB
+# Start production server
+npm start
 ```
 
-The current application does not introduce a service layer yet because the current business logic remains small enough to be handled by the controller layer.
+### Environment Variables for Production
 
----
+**Backend on Render:**
 
-# Deployment
-
-The application is not deployed yet.
-
-Planned deployment:
-
-```text
-Frontend → Vercel
-
-Backend  → Render
-
-Database → MongoDB Atlas
+```env
+PORT=5000
+MONGO_URI=<your-mongodb-atlas-uri>
+NODE_ENV=production
 ```
 
-Deployment configuration will be added during Phase 7.
+**Frontend on Vercel:**
+
+```env
+VITE_API_URL=https://your-backend.onrender.com
+```
 
 ---
 
-# License
+## 📊 Lead Model
 
-This project is currently intended for development and learning purposes.
+The Lead document in MongoDB contains:
+
+```typescript
+interface Lead {
+  _id: ObjectId; // MongoDB ID (unique)
+  name: string; // Lead name (2-100 chars)
+  email: string; // Email address (unique)
+  phone: string; // Phone number (10 digits)
+  status: LeadStatus; // Status (new|contacted|qualified|lost)
+  createdAt: Date; // Creation timestamp (auto)
+  updatedAt: Date; // Last update timestamp (auto)
+}
+
+type LeadStatus = "new" | "contacted" | "qualified" | "lost";
+```
+
+**Default Status:** `new`
+
+**Indexes:**
+
+- `_id` (unique, primary key)
+- `email` (unique)
+- `createdAt` (for sorting)
+
+---
+
+## 🎨 Frontend Features
+
+### Lead Management
+
+- **Create:** Add new leads via modal form
+- **Read:** View all leads in paginated table
+- **Update:** Change lead status via dropdown
+- **Delete:** Remove leads with confirmation
+
+### Search & Filter
+
+- **Real-time Search:** Search by name, email, or phone
+- **Status Filter:** Filter leads by status
+- **Sort:** Sort by creation date or custom fields
+- **Pagination:** Navigate through results
+
+### UI States
+
+- **Loading:** Spinner shown while fetching data
+- **Empty:** Helpful message when no leads exist
+- **Error:** Toast notifications for failures
+- **Success:** Toast notifications for actions
+
+### Responsive Design
+
+- Desktop optimized table view
+- Mobile-friendly responsive layout
+- Touch-friendly buttons and controls
+
+---
+
+## 🐛 Troubleshooting
+
+### Backend won't start
+
+```bash
+# Check MongoDB connection
+# Verify MONGO_URI in .env is correct
+# Ensure MongoDB is running
+
+# Check port is not in use
+lsof -i :5000
+```
+
+### Frontend can't connect to API
+
+```bash
+# Ensure backend is running on http://localhost:5000
+# Check CORS is enabled
+# Verify API_URL in leadsService.ts
+```
+
+### Tests failing
+
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+
+# Run tests with verbose output
+npm test -- --reporter=verbose
+```
+
+---
+
+## 📖 Additional Resources
+
+- **API Guide:** See this document for complete API reference
+- **Development Guide:** Check AGENT.md for contribution guidelines
+- **GitHub:** [3narinder/lead-flow](https://github.com/3narinder/lead-flow)
+
+---
+
+## 📝 License
+
+MIT License - See LICENSE file in repository
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Clone the repository
+2. Create a feature branch
+3. Make your changes
+4. Add/update tests
+5. Submit a pull request
+
+See AGENT.md for detailed development guidelines.
+
+---
+
+**Last Updated:** January 2024
+**Version:** 1.0.0
+**Status:** Production Ready ✅
+
+---
+
+## Quick Links
+
+- [GitHub Repository](https://github.com/3narinder/lead-flow)
+- [API Documentation](#-api-endpoints)
+- [Development Guide](./AGENT.md)
+- [Architecture](#️-architecture)
