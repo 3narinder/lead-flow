@@ -33,42 +33,50 @@ export const createLead = async (req: Request, res: Response) => {
 
 //* --------------------------------------------------
 //* @GET /api/leads
-//* Get leads with search, sorting and pagination
+//*  Get leads with search, status filtering, sorting and pagination
 //* --------------------------------------------------
 
 export const getLeads = async (req: Request, res: Response) => {
-  //* ----------------------------------------------
-  //* Search
-  //* ----------------------------------------------
+  // --------------------------------------------------
+  // Search
+  // --------------------------------------------------
 
   const search =
     typeof req.query.search === "string" ? req.query.search.trim() : "";
 
-  //* ----------------------------------------------
+  //* Status filter
+
+  const status =
+    typeof req.query.status === "string" ? req.query.status.trim() : "";
+
   //* Pagination
-  //* ----------------------------------------------
 
   const page = typeof req.query.page === "string" ? Number(req.query.page) : 1;
 
-  //* Limit the number of leads returned per page to a maximum of 100. Default is 10.
   const limit =
     typeof req.query.limit === "string" ? Number(req.query.limit) : 10;
 
-  //* Make sure page and limit are valid numbers and page is a positive integer.
+  //* Make sure page is a positive integer
   const currentPage = Number.isInteger(page) && page > 0 ? page : 1;
 
-  //* Make sure limit is a positive integer and doesn't exceed 100.
+  //* Make sure limit is a positive integer and doesn't exceed 100
   const currentLimit =
     Number.isInteger(limit) && limit > 0 && limit <= 100 ? limit : 10;
 
   //* Number of documents to skip
   const skip = (currentPage - 1) * currentLimit;
 
-  //* ----------------------------------------------
-  //* Build search filter
-  //* ----------------------------------------------
+  //* Build filter
 
   const filter: Record<string, unknown> = {};
+
+  //* Exact status filter
+
+  if (status) {
+    filter.status = status;
+  }
+
+  //* Search filter
 
   if (search) {
     filter.$or = [
@@ -99,12 +107,7 @@ export const getLeads = async (req: Request, res: Response) => {
     ];
   }
 
-  //* ----------------------------------------------
   //* Get leads + total count
-  //* ----------------------------------------------
-  //* Run both database operations at the same time
-  //* Query 1: Get the current page of leads.
-  //* Query 2: Count all matching leads.
 
   const [leads, totalLeads] = await Promise.all([
     Lead.find(filter).sort({ createdAt: -1 }).skip(skip).limit(currentLimit),
@@ -112,11 +115,13 @@ export const getLeads = async (req: Request, res: Response) => {
     Lead.countDocuments(filter),
   ]);
 
-  //* Calculate total number of pages.
+  //* Calculate total pages
   const totalPages = Math.ceil(totalLeads / currentLimit);
 
+  //* Response
   return res.status(200).json({
     success: true,
+
     pagination: {
       page: currentPage,
       limit: currentLimit,
@@ -125,6 +130,7 @@ export const getLeads = async (req: Request, res: Response) => {
       hasNextPage: currentPage < totalPages,
       hasPreviousPage: currentPage > 1,
     },
+
     data: leads,
   });
 };

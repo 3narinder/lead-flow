@@ -1,1 +1,160 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #5b6eae;
+  --color-primary-soft: #eef1f8;
+
+  --color-background: #f3f5f9;
+  --color-surface: #ffffff;
+
+  --color-text-primary: #1a2332;
+  --color-text-secondary: #6b7789;
+
+  --color-border: #e4e9f0;
+
+  --color-success: #0d9488;
+  --color-warning: #c27803;
+  --color-error: #c0392b;
+  --color-neutral: #6b7789;
+
+  --font-inter: "Inter", sans-serif;
+
+  --shadow-card: 0 10px 30px rgba(26, 35, 50, 0.05);
+  --shadow-modal: 0 24px 64px rgba(26, 35, 50, 0.12);
+}
+
+@layer base {
+  body {
+    @apply bg-background font-inter text-text-primary antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    @apply m-0;
+  }
+}
+
+@layer components {
+  .page-title {
+    @apply text-2xl font-semibold leading-tight tracking-tight text-text-primary;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold leading-6 text-text-primary;
+  }
+
+  .section-title-lg {
+    @apply text-xl font-semibold leading-7 text-text-primary;
+  }
+
+  .body-text {
+    @apply text-sm font-normal leading-5 text-text-primary;
+  }
+
+  .body-text-lg {
+    @apply text-base font-normal leading-6 text-text-primary;
+  }
+
+  .secondary-text {
+    @apply text-xs font-normal leading-4 text-text-secondary;
+  }
+
+  .secondary-text-sm {
+    @apply text-[13px] font-normal leading-5 text-text-secondary;
+  }
+
+  .label {
+    @apply text-sm font-medium leading-5 text-text-primary;
+  }
+
+  .label-sm {
+    @apply text-xs font-medium leading-4 text-text-secondary;
+  }
+
+  .table-text {
+    @apply text-sm font-normal leading-5 text-text-primary;
+  }
+
+  .table-header {
+    @apply text-xs font-semibold uppercase tracking-wide text-text-secondary;
+  }
+
+  .btn-primary {
+    @apply rounded-xl bg-primary text-sm font-medium text-white shadow-[0_10px_24px_rgba(91,110,174,0.28)] transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/25;
+  }
+
+  .input-control {
+    @apply w-full rounded-xl border border-border bg-surface px-3 text-sm text-text-primary outline-none transition placeholder:text-text-secondary focus:border-primary focus:ring-4 focus:ring-primary/10;
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-modal {
+    box-shadow: var(--shadow-modal);
+  }
+
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold tracking-wide;
+  }
+
+  .status-badge-dot {
+    @apply h-1.5 w-1.5 shrink-0 rounded-full;
+  }
+
+  .status-badge-new {
+    border-color: #c5cee8;
+    background-color: #eef1f8;
+    color: #4a5a94;
+  }
+
+  .status-badge-new .status-badge-dot {
+    background-color: #5b6eae;
+  }
+
+  .status-badge-contacted {
+    border-color: #f0d9a8;
+    background-color: #fdf6e8;
+    color: #9a6700;
+  }
+
+  .status-badge-contacted .status-badge-dot {
+    background-color: #c27803;
+  }
+
+  .status-badge-qualified {
+    border-color: #a8ddd8;
+    background-color: #ecfbf9;
+    color: #0f766e;
+  }
+
+  .status-badge-qualified .status-badge-dot {
+    background-color: #0d9488;
+  }
+
+  .status-badge-converted {
+    border-color: #b8e0c4;
+    background-color: #eefbf2;
+    color: #15803d;
+  }
+
+  .status-badge-converted .status-badge-dot {
+    background-color: #16a34a;
+  }
+
+  .status-badge-lost {
+    border-color: #f0c5c0;
+    background-color: #fdf0ee;
+    color: #b42318;
+  }
+
+  .status-badge-lost .status-badge-dot {
+    background-color: #c0392b;
+  }
+}

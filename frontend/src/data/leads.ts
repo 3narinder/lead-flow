@@ -1,0 +1,88 @@
+import type { Lead as LeadType } from "../types/lead";
+
+export const leads: LeadType[] = [
+  {
+    id: "1",
+    name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "+91 98765 43210",
+    status: "new",
+  },
+  {
+    id: "2",
+    name: "Sarah Smith",
+    email: "sarah.smith@example.com",
+    phone: "+91 98123 45678",
+    status: "contacted",
+  },
+  {
+    id: "3",
+    name: "Michael Johnson",
+    email: "michael.j@example.com",
+    phone: "+91 98989 12345",
+    status: "qualified",
+  },
+  {
+    id: "4",
+    name: "Emily Williams",
+    email: "emily.w@example.com",
+    phone: "+91 97654 32109",
+    status: "converted",
+  },
+  {
+    id: "5",
+    name: "David Brown",
+    email: "david.brown@example.com",
+    phone: "+91 99887 66554",
+    status: "lost",
+  },
+  {
+    id: "6",
+    name: "Olivia Davis",
+    email: "olivia.davis@example.com",
+    phone: "+91 98712 34567",
+    status: "new",
+  },
+  {
+    id: "7",
+    name: "James Wilson",
+    email: "james.w@example.com",
+    phone: "+91 98223 45678",
+    status: "contacted",
+  },
+  {
+    id: "8",
+    name: "Sophia Miller",
+    email: "sophia.miller@example.com",
+    phone: "+91 99112 23344",
+    status: "qualified",
+  },
+  {
+    id: "9",
+    name: "Daniel Moore",
+    email: "daniel.moore@example.com",
+    phone: "+91 97979 11223",
+    status: "converted",
+  },
+  {
+    id: "10",
+    name: "Emma Taylor",
+    email: "emma.taylor@example.com",
+    phone: "+91 98888 77665",
+    status: "new",
+  },
+  {
+    id: "11",
+    name: "William Anderson",
+    email: "william.a@example.com",
+    phone: "+91 97555 66778",
+    status: "contacted",
+  },
+  {
+    id: "12",
+    name: "Ava Thomas",
+    email: "ava.thomas@example.com",
+    phone: "+91 98666 55443",
+    status: "lost",
+  },
+];
