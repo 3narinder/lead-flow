@@ -2,7 +2,10 @@
 
 This guide provides practical examples for using the LeadFlow API across different scenarios.
 
-**Base URL:** `http://localhost:5000` (development)
+**Base URLs:**
+
+- **Production:** `https://lead-flow-ncmu.onrender.com`
+- **Development:** `http://localhost:5000`
 
 ---
 
@@ -21,21 +24,35 @@ This guide provides practical examples for using the LeadFlow API across differe
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Access the Live API
+
+**No setup needed!** The API is deployed and live at:
+
+```
+https://lead-flow-ncmu.onrender.com
+```
+
+### Local Development (Optional)
 
 ```bash
-# Backend running
+# Backend running locally
 cd backend && npm run dev
 # Runs on http://localhost:5000
 
-# Frontend running (optional)
+# Frontend running locally (optional)
 cd frontend && npm run dev
 # Runs on http://localhost:5173
 ```
 
-### Testing API
+### Testing the API
 
-**Option 1: cURL (Command Line)**
+**Production API (Recommended):**
+
+```bash
+curl https://lead-flow-ncmu.onrender.com/health
+```
+
+**Local API (Development):**
 
 ```bash
 curl http://localhost:5000/health
@@ -71,6 +88,16 @@ fetch("http://localhost:5000/api/leads")
 **Minimal Request (Required Fields Only):**
 
 ```bash
+# Production
+curl -X POST https://lead-flow-ncmu.onrender.com/api/leads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "9876543210"
+  }'
+
+# Or local development
 curl -X POST http://localhost:5000/api/leads \
   -H "Content-Type: application/json" \
   -d '{

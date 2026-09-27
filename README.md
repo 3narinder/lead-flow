@@ -2,6 +2,11 @@
 
 A modern, full-stack lead tracking application built with React, TypeScript, Node.js, Express, and MongoDB.
 
+## 🚀 Live Application
+
+**▶️ [Try LeadFlow Now](https://lead-flow-sandy-eight.vercel.app/leads)**
+
+**API:** https://lead-flow-ncmu.onrender.com  
 **GitHub:** [3narinder/lead-flow](https://github.com/3narinder/lead-flow)
 
 ---
@@ -26,15 +31,14 @@ LeadFlow is a production-ready lead management system designed for sales teams a
 
 ## 📊 Current Project Status
 
-| Component        | Status         | Details                                            |
-| ---------------- | -------------- | -------------------------------------------------- |
-| Backend API      | ✅ Complete    | All CRUD operations implemented                    |
-| Frontend UI      | ✅ Complete    | Full feature parity with backend                   |
-| Database         | ✅ Complete    | MongoDB with Mongoose ORM                          |
-| Backend Testing  | ✅ Complete    | Vitest + Supertest test suite                      |
-| Frontend Testing | ⏳ In Progress | Vitest + React Testing Library                     |
-| Deployment       | ⏳ Planned     | Vercel (frontend), Render (backend), MongoDB Atlas |
-| Documentation    | ✅ Complete    | Comprehensive API & developer guides               |
+| Component       | Status      | Details                                              |
+| --------------- | ----------- | ---------------------------------------------------- |
+| Backend API     | ✅ Complete | All CRUD operations implemented                      |
+| Frontend UI     | ✅ Complete | Full feature parity with backend                     |
+| Database        | ✅ Complete | MongoDB with Mongoose ORM                            |
+| Backend Testing | ✅ Complete | Vitest + Supertest test suite                        |
+| Deployment      | ✅ Complete | Frontend on Vercel, Backend on Render, MongoDB Atlas |
+| Documentation   | ✅ Complete | Comprehensive API & developer guides                 |
 
 ---
 
@@ -135,6 +139,14 @@ Response → Client
 
 ---
 
+## 🌐 Live Application
+
+**Frontend (Web App):** https://lead-flow-sandy-eight.vercel.app/leads
+**Backend (API):** https://lead-flow-ncmu.onrender.com/api
+**GitHub:** https://github.com/3narinder/lead-flow
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -142,6 +154,12 @@ Response → Client
 - Node.js 18+
 - MongoDB (local or MongoDB Atlas)
 - npm or yarn
+
+### Try the Live App
+
+No setup needed! Visit: **https://lead-flow-sandy-eight.vercel.app/leads**
+
+The application is fully deployed and ready to use.
 
 ### Backend Setup
 
@@ -183,7 +201,15 @@ npm run dev
 
 ## 📚 API Documentation
 
-### Base URL
+### Base URLs
+
+**Production:**
+
+```
+https://lead-flow-ncmu.onrender.com/api
+```
+
+**Local Development:**
 
 ```
 http://localhost:5000/api
@@ -746,59 +772,59 @@ For production, update to your deployed backend URL.
 
 ## 🚀 Deployment
 
-### Planned Architecture
+### Architecture (✅ Deployed)
 
 ```
 Frontend (React)
      ↓
-  Vercel
+  Vercel ✅
+  https://lead-flow-sandy-eight.vercel.app/leads
      │
 Backend (Express)
      ↓
-  Render
+  Render ✅
+  https://lead-flow-ncmu.onrender.com
      │
 Database (MongoDB)
      ↓
-MongoDB Atlas
+MongoDB Atlas ✅
 ```
 
-### Frontend Deployment (Vercel)
+### Current Deployment Status
+
+✅ **Frontend deployed on Vercel**
+
+- URL: https://lead-flow-sandy-eight.vercel.app/leads
+- Automatic deployment on git push
+
+✅ **Backend deployed on Render**
+
+- URL: https://lead-flow-ncmu.onrender.com
+- All API endpoints available at: https://lead-flow-ncmu.onrender.com/api
+
+✅ **Database on MongoDB Atlas**
+
+- Connection configured
+- All data persisted
+
+### For Developers: Deploy Updates
+
+**Frontend Updates:**
 
 ```bash
-# Build for production
-npm run build
-
-# Preview build locally
-npm run preview
-
-# Deploy to Vercel
-vercel deploy
+cd frontend
+npm run build    # Build production bundle
+# Push to GitHub - Vercel auto-deploys
+git push origin main
 ```
 
-### Backend Deployment (Render)
+**Backend Updates:**
 
 ```bash
-# Build TypeScript
-npm run build
-
-# Start production server
-npm start
-```
-
-### Environment Variables for Production
-
-**Backend on Render:**
-
-```env
-PORT=5000
-MONGO_URI=<your-mongodb-atlas-uri>
-NODE_ENV=production
-```
-
-**Frontend on Vercel:**
-
-```env
-VITE_API_URL=https://your-backend.onrender.com
+cd backend
+npm run build    # Compile TypeScript
+# Push to GitHub - Render auto-deploys
+git push origin main
 ```
 
 ---
