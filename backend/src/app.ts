@@ -6,11 +6,14 @@ import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter((origin): origin is string => Boolean(origin));
 //* Global middleware
-
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: allowedOrigins,
   }),
 );
 app.use(express.json());
